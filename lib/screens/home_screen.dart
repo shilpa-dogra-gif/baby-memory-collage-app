@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/baby_profile_provider.dart';
+import 'create_collage_screen.dart';
+import 'themes_screen.dart';
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,10 +13,36 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  Widget _buildProfileView() {
+    final babyProfile = Provider.of<BabyProfileProvider>(context).babyProfile;
+    if (babyProfile == null) {
+      return Center(child: Text('No baby profile found.'));
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Baby Profile',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Text('Name: ${babyProfile.name}', style: TextStyle(fontSize: 18)),
+          SizedBox(height: 10),
+          Text('Birthdate: ${babyProfile.birthDate.toLocal().toString().split(' ')[0]}',
+              style: TextStyle(fontSize: 18)),
+        ],
+      ),
+    );
+  }
+
+  static const List<Widget> _widgetOptionsPlaceholder = <Widget>[
     Center(child: Text('My Collages')),
-    Center(child: Text('Create New')),
-    Center(child: Text('Themes')),
+    // Placeholder for Create New replaced with empty container
+    SizedBox.shrink(),
+    // Placeholder for Themes replaced with empty container
+    SizedBox.shrink(),
     Center(child: Text('Settings')),
   ];
 
@@ -23,11 +54,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget bodyContent;
+    if (_selectedIndex == 0) {
+      bodyContent = _buildProfileView();
+    } else if (_selectedIndex == 1) {
+      // Show CreateCollageScreen for "Create New" tab
+      bodyContent = CreateCollageScreen();
+    } else if (_selectedIndex == 2) {
+      // Show ThemesScreen for "Themes" tab
+      bodyContent = ThemesScreen();
+    } else {
+      bodyContent = _widgetOptionsPlaceholder.elementAt(_selectedIndex);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Baby Memory Collage'),
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: bodyContent,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
