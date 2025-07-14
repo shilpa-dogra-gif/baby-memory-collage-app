@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../models/baby_profile.dart';
+import '../providers/baby_profile_provider.dart';
 
 class BabySetupScreen extends StatefulWidget {
   @override
@@ -12,11 +15,14 @@ class _BabySetupScreenState extends State<BabySetupScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate() && _birthDate != null) {
-      // Save baby profile and navigate to next screen
-      // For now, just print values
-      print('Baby Name: ${_nameController.text}');
-      print('Birth Date: $_birthDate');
-      // TODO: Save to app state or backend
+      // Save baby profile to provider and navigate to next screen
+      final babyProfile = BabyProfile(
+        name: _nameController.text.trim(),
+        birthDate: _birthDate!,
+      );
+      // Use Provider to save baby profile
+      final provider = Provider.of<BabyProfileProvider>(context, listen: false);
+      provider.setBabyProfile(babyProfile);
 
       // Navigate to PermissionsScreen
       Navigator.of(context).pushReplacementNamed('/permissions');
